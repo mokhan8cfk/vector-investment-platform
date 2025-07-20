@@ -1,0 +1,46 @@
+{
+  "functions": {
+    "api/stock-lookup.js": {
+      "maxDuration": 30
+    },
+    "api/market-update.js": {
+      "maxDuration": 300
+    }
+  },
+  "crons": [
+    {
+      "path": "/api/market-update",
+      "schedule": "30 21 * * 1-5"
+    }
+  ],
+  "env": {
+    "IEX_API_KEY": "@iex-api-key",
+    "ALPHA_VANTAGE_API_KEY": "@alpha-vantage-api-key", 
+    "CRON_SECRET": "@cron-secret"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Authorization"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ]
+}
