@@ -6,19 +6,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      # Set up Node.js
       - uses: actions/setup-node@v3
         with:
           node-version: 20
-      
-      # Install dependencies
       - run: npm install
-      
-      # Build project (adjust if your project uses a different command)
       - run: npm run build
-      
-      # Deploy to Vercel
       - run: npx vercel --prod --token ${{ secrets.VERCEL_TOKEN }}
         env:
           UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
