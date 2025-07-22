@@ -1,27 +1,39 @@
 // api/stock-lookup.js - Real-time stock analysis endpoint
+const { Redis } = require('@upstash/redis');
 import { kv } from '@vercel/kv';
 import { getStockData } from '../lib/financial-apis.js';
 import { calculateVectorScore } from '../lib/vector-calculator.js';
 
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN,
+});
+
 export default async function handler(req, res) {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // [YOUR EXISTING INPUT VALIDATION CODE HERE]
+  
+  const cacheKey = `stock:${symbol.toUpperCase()}`; // Add this line
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+  try {
+    // -- NEW CACHE CHECK CODE --
+    const cachedData = await redis.get(cacheKey);
+    if (cachedData) {
+      console.log('Cache hit for', symbol);
+      return res.status(200).json(cachedData);
+    }
+    // -- END NEW CODE --
+
+    // [YOUR EXISTING DATA FETCHING LOGIC HERE]
+    
+    // -- NEW CACHE SET CODE --
+    await redis.setex(cacheKey, 300, JSON.stringify(stockData));
+    // -- END NEW CODE --
+
+    // [YOUR EXISTING RESPONSE CODE HERE]
+  } catch (error) {
+    // [YOUR EXISTING ERROR HANDLING]
   }
-
-  if (req.method !== 'GET') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
-  const { symbol } = req.query;
-
-  if (!symbol || typeof symbol !== 'string') {
-    return res.status(400).json({ error: 'Stock symbol is required' });
-  }
+}
 
   const upperSymbol = symbol.toUpperCase();
 
